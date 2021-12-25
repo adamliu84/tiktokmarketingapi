@@ -31,5 +31,8 @@ app.get('/test', async (req, res) => {
         })
 });
 
+const bareboneRouter = require('./routes/barebone');
+app.use('/api/barebone', bareboneRouter);
+
 console.log("START BACKEND SERVER");
 app.listen(PORT);
