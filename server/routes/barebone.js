@@ -36,4 +36,22 @@ router.get('/adgroup', async (req, res) => {
         })
 })
 
+router.get('/ad', async (req, res) => {
+    const adgroupId = req.query.adgroupId;
+    axios.get(process.env.BASE_URL + "/ad/get/",
+        {
+            headers: {
+                'Access-Token': process.env.ACCESS_TOKEN
+            },
+            params: {
+                advertiser_id: process.env.ADVERTISER_ID,
+                filtering: { adgroup_ids: [adgroupId] }
+            },
+        }).then(function (response) {
+            res.json(response.data.data.list);
+        }).catch(function (error) {
+            console.error(error);
+        })
+})
+
 module.exports = router
