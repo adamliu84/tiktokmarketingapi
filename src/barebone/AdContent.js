@@ -58,7 +58,6 @@ export default function AdgroupContent(props) {
   useEffect(() => {
     axios.get("/api/barebone/ad", { params: { adgroupId: adgroupId } }
     ).then(function (response) {
-      console.log(response.data);
       setAds(response.data);
     }).catch(function (error) {
       console.error(error);
