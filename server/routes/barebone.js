@@ -18,6 +18,27 @@ router.get('/campaign', async (req, res) => {
         })
 })
 
+router.post('/campaign', async (req, res) => {
+    const currentTimeInMilliseconds = Date.now(); // unix timestamp in milliseconds
+    axios.post(process.env.BASE_URL + "/campaign/create/",
+        {
+            advertiser_id: process.env.ADVERTISER_ID,
+            "budget_mode": "BUDGET_MODE_DAY",
+            "objective_type": "REACH",
+            "budget": "99.99",
+            "campaign_name": "Campaign " + currentTimeInMilliseconds,
+        }, {
+        headers: {
+            'Access-Token': process.env.ACCESS_TOKEN
+        }
+    }
+    ).then(function (response) {
+        console.log(response.data);
+    }).catch(function (error) {
+        console.error(error);
+    })
+})
+
 router.get('/adgroup', async (req, res) => {
     const campaignId = req.query.campaignId;
     axios.get(process.env.BASE_URL + "/adgroup/get/",

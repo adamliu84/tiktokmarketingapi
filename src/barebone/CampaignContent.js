@@ -12,6 +12,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import PlayForWorkIcon from '@mui/icons-material/PlayForWork';
+const axios = require('axios');
 
 const CampaignTable = (props) => {
   const { campaigns, selectCampaign } = props;
@@ -54,6 +55,15 @@ export default function CampaignContent(props) {
 
   const { campaigns } = props;
 
+  const createCampaign = () => {
+    axios.post("/api/barebone/campaign"
+    ).then(function (response) {
+      console.log(response.data);
+    }).catch(function (error) {
+      console.error(error);
+    })
+  }
+
   return (
     <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
       <AppBar
@@ -70,7 +80,7 @@ export default function CampaignContent(props) {
               </Typography>
             </Grid>
             <Grid item xs={4}>
-              <Button variant="contained" sx={{ mr: 1 }}>
+              <Button variant="contained" sx={{ mr: 1 }} onClick={() => createCampaign()}>
                 Add Campaign
               </Button>
             </Grid>
