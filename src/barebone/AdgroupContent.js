@@ -65,6 +65,15 @@ export default function AdgroupContent(props) {
     })
   }, [campaignId]);
 
+  const createAdGroup = () => {
+    axios.post("/api/barebone/adgroup", { campaignId: campaignId }
+    ).then(function (response) {
+      console.log(response.data);
+    }).catch(function (error) {
+      console.error(error);
+    })
+  }
+
   return (
     <Paper sx={{ maxWidth: 936, margin: 'auto', overflow: 'hidden' }}>
       <AppBar
@@ -81,7 +90,7 @@ export default function AdgroupContent(props) {
               </Typography>
             </Grid>
             <Grid item xs={4}>
-              <Button variant="contained" sx={{ mr: 1 }}>
+              <Button variant="contained" sx={{ mr: 1 }} onClick={() => createAdGroup()}>
                 Add Adgroup
               </Button>
             </Grid>
