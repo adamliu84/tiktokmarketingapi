@@ -112,4 +112,34 @@ router.get('/ad', async (req, res) => {
         })
 })
 
+router.post('/ad', async (req, res) => {
+    const adgroupId = req.body.adgroupId;
+    const currentTimeInMilliseconds = Date.now(); // unix timestamp in milliseconds
+    axios.post(process.env.BASE_URL + "/ad/create/",
+        {
+            advertiser_id: process.env.ADVERTISER_ID,
+            adgroup_id: adgroupId,
+            creatives: [
+                {
+                    ad_name: "Ad " + currentTimeInMilliseconds,
+                    app_name: "AppName " + currentTimeInMilliseconds,
+                    ad_text: "AdText " + currentTimeInMilliseconds,
+                    display_name: "DisplayName " + currentTimeInMilliseconds,
+                    ad_format: "SINGLE_VIDEO",
+                    video_id: "vXXXYYYZZZ",
+                    image_ids: ["ad-site-i18n-sg/XXXYYYZZZ"]
+                }
+            ]
+        }, {
+        headers: {
+            'Access-Token': process.env.ACCESS_TOKEN
+        }
+    }
+    ).then(function (response) {
+        console.log(response.data);
+    }).catch(function (error) {
+        console.error(error);
+    })
+})
+
 module.exports = router
