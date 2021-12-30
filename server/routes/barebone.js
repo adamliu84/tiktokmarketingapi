@@ -1,6 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const axios = require('axios');
+const md5File = require('md5-file')
+const FormData = require('form-data');
+fs = require('fs');
 
 router.get('/campaign', async (req, res) => {
     axios.get(process.env.BASE_URL + "/campaign/get/",
@@ -114,6 +117,7 @@ router.get('/ad', async (req, res) => {
 
 router.post('/ad', async (req, res) => {
     const adgroupId = req.body.adgroupId;
+    const [image_id, video_id] = await Promise.all([adImageAssetUpload(), adVideoAssetUpload()]);
     const currentTimeInMilliseconds = Date.now(); // unix timestamp in milliseconds
     axios.post(process.env.BASE_URL + "/ad/create/",
         {
@@ -126,8 +130,8 @@ router.post('/ad', async (req, res) => {
                     ad_text: "AdText " + currentTimeInMilliseconds,
                     display_name: "DisplayName " + currentTimeInMilliseconds,
                     ad_format: "SINGLE_VIDEO",
-                    video_id: "vXXXYYYZZZ",
-                    image_ids: ["ad-site-i18n-sg/XXXYYYZZZ"]
+                    video_id: video_id,
+                    image_ids: [image_id]
                 }
             ]
         }, {
@@ -141,5 +145,53 @@ router.post('/ad', async (req, res) => {
         console.error(error);
     })
 })
+
+const adImageAssetUpload = async () => {
+    const image_path = "./adasset/image.png";
+    const image_hash = md5File.sync(image_path)
+
+    let image_data = new FormData();
+    image_data.append('image_file', fs.createReadStream(image_path), 'image.png');
+    image_data.append('image_signature', image_hash);
+    image_data.append('advertiser_id', process.env.ADVERTISER_ID);
+    return await axios.post(process.env.BASE_URL + "/file/image/ad/upload/",
+        image_data,
+        {
+            headers: {
+                'Content-Type': `multipart/form-data; boundary=${image_data._boundary}`,
+                'Access-Token': process.env.ACCESS_TOKEN,
+            }
+        }
+    ).then(function (response) {
+        return (response.data.data.id);
+    }).catch(function (error) {
+        return "";
+    });
+}
+
+const adVideoAssetUpload = async () => {
+    const video_path = "./adasset/video.mov";
+    const video_hash = md5File.sync(video_path)
+
+    let video_data = new FormData();
+    video_data.append('advertiser_id', process.env.ADVERTISER_ID);
+    video_data.append('upload_type', 'UPLOAD_BY_FILE');
+    video_data.append('video_file', fs.createReadStream(video_path));
+    video_data.append('file_name', 'video.mov');
+    video_data.append('video_signature', video_hash);
+    return await axios.post(process.env.BASE_URL + "/file/video/ad/upload/",
+        video_data,
+        {
+            headers: {
+                'Content-Type': `multipart/form-data; boundary=${video_data._boundary}`,
+                'Access-Token': process.env.ACCESS_TOKEN,
+            }
+        }
+    ).then(function (response) {
+        return (response.data.data[0].video_id);
+    }).catch(function (error) {
+        return "";
+    });
+}
 
 module.exports = router
